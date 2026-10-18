@@ -12,9 +12,6 @@
     <exclude
         domain="root"
         path="app_webview/VideoDecodeStats" />
-    <exclude
-        domain="database"
-        path="." />
     <include
         domain="sharedpref"
         path="org.jellyfin.mobile_preferences" />
