@@ -7,7 +7,6 @@ import androidx.core.content.edit
 import org.jellyfin.mobile.downloads.DownloadMethod
 import org.jellyfin.mobile.player.mediasegments.MediaSegmentAction
 import org.jellyfin.mobile.player.mediasegments.toMediaSegmentActionsString
-import org.jellyfin.mobile.settings.ExternalPlayerPackage
 import org.jellyfin.mobile.settings.VideoPlayerType
 import org.jellyfin.mobile.utils.Constants
 import org.jellyfin.sdk.model.api.MediaSegmentType
@@ -94,7 +93,8 @@ class AppPreferences(context: Context) {
 
     @VideoPlayerType
     val videoPlayerType: String
-        get() = sharedPreferences.getString(Constants.PREF_VIDEO_PLAYER_TYPE, VideoPlayerType.EXO_PLAYER)!!
+        get() = sharedPreferences.getString(Constants.PREF_VIDEO_PLAYER_TYPE, VideoPlayerType.EXO_PLAYER)
+            ?.takeIf { it == VideoPlayerType.WEB_PLAYER } ?: VideoPlayerType.EXO_PLAYER
 
     val exoPlayerStartLandscapeVideoInLandscape: Boolean
         get() = sharedPreferences.getBoolean(Constants.PREF_EXOPLAYER_START_LANDSCAPE_VIDEO_IN_LANDSCAPE, false)
@@ -127,9 +127,4 @@ class AppPreferences(context: Context) {
 
     val exoPlayerNetworkBuffer: String
         get() = sharedPreferences.getString(Constants.PREF_EXOPLAYER_NETWORK_BUFFER, Constants.NETWORK_BUFFER_AUTO)!!
-
-    @ExternalPlayerPackage
-    var externalPlayerApp: String
-        get() = sharedPreferences.getString(Constants.PREF_EXTERNAL_PLAYER_APP, ExternalPlayerPackage.SYSTEM_DEFAULT)!!
-        set(value) = sharedPreferences.edit { putString(Constants.PREF_EXTERNAL_PLAYER_APP, value) }
 }

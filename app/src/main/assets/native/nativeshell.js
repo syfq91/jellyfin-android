@@ -19,7 +19,6 @@ const features = [
 const plugins = [
     'NavigationPlugin',
     'ExoPlayerPlugin',
-    'ExternalPlayerPlugin',
     'MediaSegmentsPlugin'
 ];
 

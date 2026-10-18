@@ -44,7 +44,6 @@ object Constants {
     const val NETWORK_BUFFER_AUTO = "auto"
     const val NETWORK_BUFFER_LARGE = "large"
     const val NETWORK_BUFFER_EXTRA_LARGE = "extra_large"
-    const val PREF_EXTERNAL_PLAYER_APP = "pref_external_player_app"
     const val PREF_SUBTITLE_STYLE = "pref_subtitle_style"
     const val PREF_STORAGE_LOCATION = "pref_storage_location"
     const val PREF_MEDIA_SEGMENT_ACTIONS = "pref_media_segment_actions"
@@ -144,17 +143,6 @@ object Constants {
     // Video player intent extras
     const val EXTRA_MEDIA_PLAY_OPTIONS = "org.jellyfin.mobile.MEDIA_PLAY_OPTIONS"
     const val EXTRA_WEB_PREFERENCES = "org.jellyfin.mobile.WEB_PREFERENCES"
-
-    // External player result actions
-    const val MPV_PLAYER_RESULT_ACTION = "is.xyz.mpv.MPVActivity.result"
-    const val MX_PLAYER_RESULT_ACTION = "com.mxtech.intent.result.VIEW"
-    const val VLC_PLAYER_RESULT_ACTION = "org.videolan.vlc.player.result"
-    const val MPVKT_PLAYER_RESULT_ACTION = "live.mehiz.mpvkt.ui.player.PlayerActivity.result"
-
-    // External player webapp events
-    const val EVENT_ENDED = "Ended"
-    const val EVENT_TIME_UPDATE = "TimeUpdate"
-    const val EVENT_CANCELED = "Canceled"
 
     // Orientation constants
     val ORIENTATION_PORTRAIT_RANGE = CombinedIntRange(340..360, 0..20)

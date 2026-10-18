@@ -209,34 +209,11 @@ class DeviceProfileBuilder(
         }
     }
 
-    fun getExternalPlayerProfile(): DeviceProfile = DeviceProfile(
-        name = EXTERNAL_PLAYER_PROFILE_NAME,
-        directPlayProfiles = listOf(
-            DirectPlayProfile(type = DlnaProfileType.VIDEO, container = ""),
-            DirectPlayProfile(type = DlnaProfileType.AUDIO, container = ""),
-        ),
-        transcodingProfiles = emptyList(),
-        containerProfiles = emptyList(),
-        codecProfiles = emptyList(),
-        subtitleProfiles = buildList {
-            EXTERNAL_PLAYER_SUBTITLES.mapTo(this) { format ->
-                SubtitleProfile(format = format, method = SubtitleDeliveryMethod.EMBED)
-            }
-            EXTERNAL_PLAYER_SUBTITLES.mapTo(this) { format ->
-                SubtitleProfile(format = format, method = SubtitleDeliveryMethod.EXTERNAL)
-            }
-        },
-        maxStreamingBitrate = Int.MAX_VALUE,
-        maxStaticBitrate = Int.MAX_VALUE,
-        musicStreamingTranscodingBitrate = Int.MAX_VALUE,
-    )
-
     fun getWebCodecCapabilitiesJson(): String = buildJsonObject {
         put("h264MaxLevel", CodecHelpers.getVideoLevel("h264", maxAvcRawLevel)?.toString() ?: DEFAULT_H264_MAX_LEVEL)
     }.toString()
 
     companion object {
-        private const val EXTERNAL_PLAYER_PROFILE_NAME = Constants.APP_INFO_NAME + " External Player"
         private const val DEFAULT_H264_MAX_LEVEL = "41"
 
         /**
@@ -333,9 +310,6 @@ class DeviceProfileBuilder(
         private val EXO_EMBEDDED_SUBTITLES = arrayOf("dvbsub", "pgssub", "srt", "subrip", "ttml")
         private val EXO_EXTERNAL_SUBTITLES = arrayOf("srt", "subrip", "ttml", "vtt", "webvtt")
         private val SUBTITLES_SSA = arrayOf("ssa", "ass")
-        private val EXTERNAL_PLAYER_SUBTITLES = arrayOf(
-            "ass", "dvbsub", "pgssub", "srt", "srt", "ssa", "subrip", "subrip", "ttml", "ttml", "vtt", "webvtt",
-        )
 
         /**
          * Taken from Jellyfin Web:

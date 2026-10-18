@@ -22,7 +22,6 @@ import org.jellyfin.mobile.MainActivity
 import org.jellyfin.mobile.R
 import org.jellyfin.mobile.app.AppPreferences
 import org.jellyfin.mobile.downloads.DownloadManager
-import org.jellyfin.mobile.settings.ExternalPlayerPackage
 import org.jellyfin.mobile.ui.utils.shouldShowDownloadSettingsDialog
 import org.jellyfin.mobile.ui.utils.showDownloadSettingsDialog
 import org.jellyfin.mobile.webapp.WebViewFragment
@@ -89,12 +88,6 @@ suspend fun MainActivity.requestDownload(itemIds: Collection<UUID>) {
 }
 
 fun Activity.isAutoRotateOn() = Settings.System.getInt(contentResolver, ACCELEROMETER_ROTATION, 0) == 1
-
-fun PackageManager.isPackageInstalled(@ExternalPlayerPackage packageName: String) = try {
-    packageName.isNotEmpty() && getApplicationInfo(packageName, 0).enabled
-} catch (e: PackageManager.NameNotFoundException) {
-    false
-}
 
 fun Context.createMediaNotificationChannel(notificationManager: NotificationManager) {
     if (AndroidVersion.isAtLeastO) {

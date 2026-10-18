@@ -26,7 +26,6 @@ import kotlinx.coroutines.launch
 import org.jellyfin.mobile.MainViewModel
 import org.jellyfin.mobile.R
 import org.jellyfin.mobile.app.AppPreferences
-import org.jellyfin.mobile.bridge.ExternalPlayer
 import org.jellyfin.mobile.bridge.MediaSegments
 import org.jellyfin.mobile.bridge.NativeInterface
 import org.jellyfin.mobile.bridge.NativePlayer
@@ -56,7 +55,6 @@ class WebViewFragment : Fragment(), BackPressInterceptor, JellyfinWebChromeClien
     private lateinit var assetsPathHandler: AssetsPathHandler
     private lateinit var jellyfinWebViewClient: JellyfinWebViewClient
     private val nativePlayer: NativePlayer by inject()
-    private lateinit var externalPlayer: ExternalPlayer
     private val mediaSegments: MediaSegments by inject()
 
     lateinit var server: ServerEntity
@@ -110,7 +108,6 @@ class WebViewFragment : Fragment(), BackPressInterceptor, JellyfinWebChromeClien
                 handleError()
             }
         }
-        externalPlayer = ExternalPlayer(requireContext(), this, requireActivity().activityResultRegistry)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -187,7 +184,6 @@ class WebViewFragment : Fragment(), BackPressInterceptor, JellyfinWebChromeClien
         settings.applyDefault()
         addJavascriptInterface(NativeInterface(requireContext()), "NativeInterface")
         addJavascriptInterface(nativePlayer, "NativePlayer")
-        addJavascriptInterface(externalPlayer, "ExternalPlayer")
         addJavascriptInterface(mediaSegments, "MediaSegments")
 
         loadUrl("${server.hostname.trimEnd('/')}/")
