@@ -117,19 +117,9 @@ class PlayerMenus(
             audioStreamsMenu.show()
         }
         subtitlesButton.setOnClickListener {
-            when (subtitleCount) {
-                0 -> return@setOnClickListener
-                1 -> {
-                    fragment.toggleSubtitles { enabled ->
-                        subtitlesEnabled = enabled
-                        updateSubtitlesButton()
-                    }
-                }
-                else -> {
-                    fragment.suppressControllerAutoHide(true)
-                    subtitlesMenu.show()
-                }
-            }
+            if (subtitleCount == 0) return@setOnClickListener
+            fragment.suppressControllerAutoHide(true)
+            subtitlesMenu.show()
         }
         speedButton.setOnClickListener {
             fragment.suppressControllerAutoHide(true)
