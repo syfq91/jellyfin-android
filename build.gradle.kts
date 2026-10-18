@@ -2,6 +2,7 @@ allprojects {
     repositories {
         mavenCentral()
         google()
+        maven("https://jitpack.io")
         mavenLocal {
             content {
                 includeVersionByRegex(JellyfinSdk.GROUP, ".*", JellyfinSdk.LOCAL)

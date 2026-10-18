@@ -27,7 +27,11 @@ import io.github.peerless2012.ass.media.type.AssRenderType
 import kotlinx.coroutines.channels.Channel
 import okhttp3.OkHttpClient
 import org.jellyfin.mobile.MainViewModel
+import org.jellyfin.mobile.book.repository.BookRepository
+import org.jellyfin.mobile.book.ui.BookReaderFragment
+import org.jellyfin.mobile.book.ui.BookReaderViewModel
 import org.jellyfin.mobile.bridge.MediaSegments
+import org.jellyfin.mobile.bridge.NativeBookPlayer
 import org.jellyfin.mobile.bridge.NativePlayer
 import org.jellyfin.mobile.downloads.DownloadManager
 import org.jellyfin.mobile.downloads.DownloadNotificationManager
@@ -80,15 +84,21 @@ val applicationModule = module {
 
     // Bridge interfaces
     single { NativePlayer(get(), get(), get(named(PLAYER_EVENT_CHANNEL))) }
+    single { NativeBookPlayer(get(), get()) }
     single { MediaSegments(get()) }
+
+    // Book Reader
+    single { BookRepository(androidApplication(), get(), get()) }
 
     // ViewModels
     viewModel { MainViewModel(get(), get()) }
     viewModel { DownloadsViewModel() }
+    viewModel { BookReaderViewModel(get(), get(), get()) }
 
     // Fragments
     fragment { WebViewFragment() }
     fragment { PlayerFragment() }
+    fragment { BookReaderFragment() }
 
     // Connection helper
     single { ConnectionHelper(get(), get()) }

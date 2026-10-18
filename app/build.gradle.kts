@@ -174,6 +174,9 @@ dependencies {
     proprietaryImplementation(libs.bundles.playservices)
     implementation(libs.libass.media)
 
+    // Readium (Book Reader)
+    implementation(libs.bundles.readium)
+
     // Room
     implementation(libs.bundles.androidx.room)
     ksp(libs.androidx.room.compiler)

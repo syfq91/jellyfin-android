@@ -197,6 +197,26 @@ class SettingsFragment : Fragment(), BackPressInterceptor {
                 }
             }
         }
+        categoryHeader(PREF_CATEGORY_BOOK_READER) {
+            titleRes = R.string.pref_category_book_reader
+        }
+        val bookReaderOptions = listOf(
+            SelectionItem(
+                BookReaderType.READIUM,
+                R.string.book_reader_readium,
+                R.string.book_reader_readium_description,
+            ),
+            SelectionItem(
+                BookReaderType.WEB_READER,
+                R.string.book_reader_web,
+                R.string.book_reader_web_description,
+            ),
+        )
+        singleChoice(Constants.PREF_BOOK_READER_TYPE, bookReaderOptions) {
+            titleRes = R.string.pref_book_reader_type_title
+            initialSelection = BookReaderType.READIUM
+        }
+
         categoryHeader(PREF_CATEGORY_DOWNLOADS) {
             titleRes = R.string.pref_category_downloads
         }
@@ -239,6 +259,7 @@ class SettingsFragment : Fragment(), BackPressInterceptor {
     companion object {
         const val PREF_CATEGORY_MUSIC_PLAYER = "pref_category_music"
         const val PREF_CATEGORY_VIDEO_PLAYER = "pref_category_video"
+        const val PREF_CATEGORY_BOOK_READER = "pref_category_book_reader"
         const val PREF_CATEGORY_DOWNLOADS = "pref_category_downloads"
     }
 }

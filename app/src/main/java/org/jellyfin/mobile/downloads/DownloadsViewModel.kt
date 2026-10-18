@@ -12,17 +12,22 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jellyfin.mobile.app.StorageManager
+import org.jellyfin.mobile.app.AppPreferences
+import org.jellyfin.mobile.book.model.BookPlayOptions
 import org.jellyfin.mobile.data.dao.DownloadDao
 import org.jellyfin.mobile.data.entity.DownloadEntity
 import org.jellyfin.mobile.data.entity.DownloadFiles
 import org.jellyfin.mobile.events.ActivityEvent
 import org.jellyfin.mobile.events.ActivityEventHandler
 import org.jellyfin.mobile.player.interaction.PlayOptions
+import org.jellyfin.mobile.settings.BookReaderType
 import org.jellyfin.sdk.model.api.MediaType
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class DownloadsViewModel : ViewModel(), KoinComponent {
+
+    private val appPreferences: AppPreferences by inject()
 
     private val downloadDao: DownloadDao by inject()
     private val downloadManager: DownloadManager by inject()
@@ -55,9 +60,37 @@ class DownloadsViewModel : ViewModel(), KoinComponent {
                 activityEventHandler.emit(ActivityEvent.LaunchNativePlayer(playOptions))
             }
 
+            MediaType.BOOK -> {
+                viewModelScope.launch {
+                    val fileUri = withContext(Dispatchers.IO) {
+                        val storageLocation = storageManager.getStorageLocation()
+                        val itemLocation = storageLocation?.findFile(download.path)
+                        if (itemLocation != null && itemLocation.isDirectory) {
+                            val filename = download.item.path?.replace(Regex("^.*[\\\\/]"), "")
+                            if (filename != null) itemLocation.findFile(filename)?.uri else null
+                        } else {
+                            null
+                        }
+                    }
+                    if (fileUri != null) {
+                        if (appPreferences.bookReaderType == BookReaderType.READIUM) {
+                            val bookOptions = BookPlayOptions(
+                                id = download.itemId,
+                                name = download.item.name ?: "Book",
+                                container = download.item.container,
+                                playFromDownloads = true,
+                                localPath = fileUri.path,
+                            )
+                            activityEventHandler.emit(ActivityEvent.LaunchNativeBookReader(bookOptions))
+                        } else {
+                            activityEventHandler.emit(ActivityEvent.OpenUrl(fileUri.toString(), true))
+                        }
+                    }
+                }
+            }
+
             MediaType.AUDIO,
             MediaType.PHOTO,
-            MediaType.BOOK,
             MediaType.UNKNOWN -> {
                 viewModelScope.launch {
                     withContext(Dispatchers.IO) {

@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import org.jellyfin.mobile.MainActivity
 import org.jellyfin.mobile.R
 import org.jellyfin.mobile.bridge.JavascriptCallback
+import org.jellyfin.mobile.book.ui.BookReaderFragment
 import org.jellyfin.mobile.downloads.DownloadsFragment
 import org.jellyfin.mobile.player.ui.PlayerFragment
 import org.jellyfin.mobile.player.ui.PlayerFullscreenHelper
@@ -65,6 +66,17 @@ class ActivityEventHandler(
                     putParcelable(Constants.EXTRA_WEB_PREFERENCES, event.preferences)
                 }
                 supportFragmentManager.addFragment<PlayerFragment>(args)
+            }
+            is ActivityEvent.LaunchNativeBookReader -> {
+                val args = Bundle().apply {
+                    putParcelable(Constants.EXTRA_BOOK_PLAY_OPTIONS, event.bookOptions)
+                }
+                supportFragmentManager.addFragment<BookReaderFragment>(args)
+            }
+            ActivityEvent.CloseNativeBookReader -> {
+                supportFragmentManager.findFragmentByTag(BookReaderFragment::class.java.name)?.let {
+                    supportFragmentManager.popBackStack()
+                }
             }
             is ActivityEvent.OpenUrl -> {
                 try {

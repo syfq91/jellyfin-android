@@ -27,6 +27,7 @@ import org.jellyfin.mobile.MainViewModel
 import org.jellyfin.mobile.R
 import org.jellyfin.mobile.app.AppPreferences
 import org.jellyfin.mobile.bridge.MediaSegments
+import org.jellyfin.mobile.bridge.NativeBookPlayer
 import org.jellyfin.mobile.bridge.NativeInterface
 import org.jellyfin.mobile.bridge.NativePlayer
 import org.jellyfin.mobile.data.entity.ServerEntity
@@ -55,6 +56,7 @@ class WebViewFragment : Fragment(), BackPressInterceptor, JellyfinWebChromeClien
     private lateinit var assetsPathHandler: AssetsPathHandler
     private lateinit var jellyfinWebViewClient: JellyfinWebViewClient
     private val nativePlayer: NativePlayer by inject()
+    private val nativeBookPlayer: NativeBookPlayer by inject()
     private val mediaSegments: MediaSegments by inject()
 
     lateinit var server: ServerEntity
@@ -184,6 +186,7 @@ class WebViewFragment : Fragment(), BackPressInterceptor, JellyfinWebChromeClien
         settings.applyDefault()
         addJavascriptInterface(NativeInterface(requireContext()), "NativeInterface")
         addJavascriptInterface(nativePlayer, "NativePlayer")
+        addJavascriptInterface(nativeBookPlayer, "NativeBookPlayer")
         addJavascriptInterface(mediaSegments, "MediaSegments")
 
         loadUrl("${server.hostname.trimEnd('/')}/")

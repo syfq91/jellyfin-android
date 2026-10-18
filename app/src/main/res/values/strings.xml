@@ -160,4 +160,24 @@
     <string name="download_location_not_set_description">To download media, please select a folder where the files should be stored.</string>
     <string name="download_location_inaccessible">Download location inaccessible</string>
     <string name="download_location_inaccessible_description">The selected download location is no longer accessible. Please select a different folder to resume downloads.</string>
+
+    <!-- Book Reader -->
+    <string name="pref_category_book_reader">Book Reader</string>
+    <string name="pref_book_reader_type_title">Reader engine</string>
+    <string name="book_reader_readium">Native reader (Readium)</string>
+    <string name="book_reader_readium_description">Fast hardware-accelerated reader with custom typography and offline support</string>
+    <string name="book_reader_web">Web reader</string>
+    <string name="book_reader_web_description">Use the embedded web client book reader</string>
+    <string name="book_reader_menu_toc">Table of contents</string>
+    <string name="book_reader_menu_settings">Reading settings</string>
+    <string name="book_reader_downloading">Loading book… %1$d%%</string>
+    <string name="book_reader_close">Close</string>
+    <string name="book_reader_toc_title">Table of Contents</string>
+    <string name="book_reader_settings_title">Reading Settings</string>
+    <string name="book_reader_settings_font_size">Font Size</string>
+    <string name="book_reader_settings_theme">Theme</string>
+    <string name="book_reader_theme_light">Light</string>
+    <string name="book_reader_theme_sepia">Sepia</string>
+    <string name="book_reader_theme_dark">Dark</string>
+    <string name="book_reader_theme_amoled">AMOLED Black</string>
 </resources>

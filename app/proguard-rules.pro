@@ -32,3 +32,10 @@
 -assumevalues class android.os.Build$VERSION {
   int SDK_INT return 21..2147483647;
 }
+
+# Readium Kotlin Toolkit
+-keep class org.readium.r2.shared.** { *; }
+-keep class org.readium.r2.streamer.** { *; }
+-keep class org.readium.r2.navigator.** { *; }
+-keep class com.shockwave.pdfium.** { *; }
+

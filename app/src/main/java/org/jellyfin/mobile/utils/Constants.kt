@@ -32,6 +32,7 @@ object Constants {
     const val PREF_DOWNLOAD_METHOD = "pref_download_method"
     const val PREF_MUSIC_NOTIFICATION_ALWAYS_DISMISSIBLE = "pref_music_notification_always_dismissible"
     const val PREF_VIDEO_PLAYER_TYPE = "pref_video_player_type"
+    const val PREF_BOOK_READER_TYPE = "pref_book_reader_type"
     const val PREF_EXOPLAYER_START_LANDSCAPE_VIDEO_IN_LANDSCAPE = "pref_exoplayer_start_landscape_video_in_landscape"
     const val PREF_EXOPLAYER_ALLOW_SWIPE_GESTURES = "pref_exoplayer_allow_swipe_gestures"
     const val PREF_EXOPLAYER_ALLOW_PRESS_SPEED_UP = "pref_exoplayer_allow_press_speed_up"
@@ -143,6 +144,7 @@ object Constants {
     // Video player intent extras
     const val EXTRA_MEDIA_PLAY_OPTIONS = "org.jellyfin.mobile.MEDIA_PLAY_OPTIONS"
     const val EXTRA_WEB_PREFERENCES = "org.jellyfin.mobile.WEB_PREFERENCES"
+    const val EXTRA_BOOK_PLAY_OPTIONS = "org.jellyfin.mobile.BOOK_PLAY_OPTIONS"
 
     // Orientation constants
     val ORIENTATION_PORTRAIT_RANGE = CombinedIntRange(340..360, 0..20)

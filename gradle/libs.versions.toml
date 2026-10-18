@@ -1,7 +1,7 @@
 [versions]
 # Android
 android-compileSdk = "37"
-android-minSdk = "23"
+android-minSdk = "24"
 android-targetSdk = "36"
 
 # Plugins
@@ -26,6 +26,7 @@ androidx-documentfile = "1.1.0"
 androidx-fragment = "1.9.1"
 androidx-work = "2.11.2"
 androiddesugarlibs = "2.1.5"
+readium = "3.4.0"
 
 # Lifecycle extensions
 androidx-lifecycle = "2.11.0"
@@ -141,6 +142,12 @@ playservices-castframework = { group = "com.google.android.gms", name = "play-se
 jellyfin-androidx-media3-ffmpeg-decoder = { module = "org.jellyfin.media3:media3-ffmpeg-decoder", version.ref = "jellyfin-androidx-media" }
 libass-media = { module = "io.github.peerless2012:ass-media", version.ref = "libass-media" }
 
+# Readium
+readium-shared = { module = "org.readium.kotlin-toolkit:readium-shared", version.ref = "readium" }
+readium-streamer = { module = "org.readium.kotlin-toolkit:readium-streamer", version.ref = "readium" }
+readium-navigator = { module = "org.readium.kotlin-toolkit:readium-navigator", version.ref = "readium" }
+readium-adapter-pdfium = { module = "org.readium.kotlin-toolkit:readium-adapter-pdfium", version.ref = "readium" }
+
 # Room
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "androidx-room" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "androidx-room" }
@@ -196,5 +203,11 @@ playservices = [
     "playservices-castframework",
 ]
 androidx-room = ["androidx-room-runtime"]
+readium = [
+    "readium-shared",
+    "readium-streamer",
+    "readium-navigator",
+    "readium-adapter-pdfium",
+]
 kotest = ["kotest-runner", "kotest-assertions", "kotest-property"]
 androidx-test = ["androidx-test-runner", "androidx-test-espresso"]

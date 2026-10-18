@@ -7,6 +7,7 @@ import androidx.core.content.edit
 import org.jellyfin.mobile.downloads.DownloadMethod
 import org.jellyfin.mobile.player.mediasegments.MediaSegmentAction
 import org.jellyfin.mobile.player.mediasegments.toMediaSegmentActionsString
+import org.jellyfin.mobile.settings.BookReaderType
 import org.jellyfin.mobile.settings.VideoPlayerType
 import org.jellyfin.mobile.utils.Constants
 import org.jellyfin.sdk.model.api.MediaSegmentType
@@ -95,6 +96,11 @@ class AppPreferences(context: Context) {
     val videoPlayerType: String
         get() = sharedPreferences.getString(Constants.PREF_VIDEO_PLAYER_TYPE, VideoPlayerType.EXO_PLAYER)
             ?.takeIf { it == VideoPlayerType.WEB_PLAYER } ?: VideoPlayerType.EXO_PLAYER
+
+    @BookReaderType
+    val bookReaderType: String
+        get() = sharedPreferences.getString(Constants.PREF_BOOK_READER_TYPE, BookReaderType.READIUM)
+            ?.takeIf { it == BookReaderType.WEB_READER } ?: BookReaderType.READIUM
 
     val exoPlayerStartLandscapeVideoInLandscape: Boolean
         get() = sharedPreferences.getBoolean(Constants.PREF_EXOPLAYER_START_LANDSCAPE_VIDEO_IN_LANDSCAPE, false)
