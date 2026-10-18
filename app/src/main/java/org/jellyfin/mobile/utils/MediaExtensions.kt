@@ -74,7 +74,8 @@ fun AudioManager.getVolumeLevelPercent(): Int {
     val stream = AudioManager.STREAM_MUSIC
     val volumeRange = getVolumeRange(stream)
     val currentVolume = getStreamVolume(stream)
-    return (currentVolume - volumeRange.first) * Constants.PERCENT_MAX / volumeRange.width
+    val width = volumeRange.width.coerceAtLeast(1)
+    return (currentVolume - volumeRange.first) * Constants.PERCENT_MAX / width
 }
 
 /**

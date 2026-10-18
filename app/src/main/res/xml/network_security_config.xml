@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config xmlns:tools="http://schemas.android.com/tools">
-    <!-- Allow cleartext network traffic -->
+    <!--
+        Allow cleartext network traffic and user-installed CAs.
+        This base configuration is required for self-hosted homelabs that run on
+        local LAN HTTP or use custom private Root CA certificates.
+        Unencrypted HTTP connections are accompanied by in-app user warnings.
+    -->
     <base-config
         cleartextTrafficPermitted="true"
         tools:ignore="InsecureBaseConfiguration">
         <trust-anchors>
             <!-- Trust pre-installed CAs -->
             <certificates src="system" />
-            <!-- Additionally trust user added CAs -->
+            <!-- Additionally trust user added CAs for private homelab setups -->
             <certificates
                 src="user"
                 tools:ignore="AcceptsUserCertificates" />

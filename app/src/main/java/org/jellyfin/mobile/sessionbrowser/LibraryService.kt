@@ -5,7 +5,11 @@ import androidx.media3.common.C
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import org.jellyfin.mobile.app.ApiClientController
 import org.jellyfin.sdk.api.client.ApiClient
 import org.koin.android.ext.android.inject
@@ -13,6 +17,7 @@ import org.koin.android.ext.android.inject
 class LibraryService : MediaLibraryService() {
     private val apiClientController: ApiClientController by inject()
     private val apiClient: ApiClient by inject()
+    private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     private val playerAudioAttributes = AudioAttributes.Builder()
         .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
@@ -32,7 +37,7 @@ class LibraryService : MediaLibraryService() {
     }
 
     private val callback: MediaLibrarySession.Callback by lazy {
-        SessionBrowserCallback(this, apiClient)
+        SessionBrowserCallback(this, apiClient, apiClientController)
     }
 
     override fun onGetSession(
@@ -42,10 +47,13 @@ class LibraryService : MediaLibraryService() {
     override fun onCreate() {
         super.onCreate()
 
-        runBlocking { apiClientController.loadSavedServerUser() }
+        serviceScope.launch {
+            apiClientController.loadSavedServerUser()
+        }
     }
 
     override fun onDestroy() {
+        serviceScope.cancel()
         exoPlayer.release()
         mediaLibrarySession.release()
 

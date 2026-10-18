@@ -7,6 +7,7 @@ import org.jellyfin.mobile.data.dao.UserDao
 import org.jellyfin.mobile.data.entity.ServerEntity
 import org.jellyfin.mobile.data.entity.ServerUser
 import org.jellyfin.mobile.data.entity.UserEntity
+import org.jellyfin.mobile.utils.TokenEncryptionHelper
 import org.jellyfin.sdk.Jellyfin
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.model.DeviceInfo
@@ -33,8 +34,9 @@ class ApiClientController(
     }
 
     suspend fun setupUser(serverId: Long, userId: UUID, accessToken: String) {
+        val encryptedToken = TokenEncryptionHelper.encrypt(accessToken)
         appPreferences.currentUserId = withContext(Dispatchers.IO) {
-            userDao.upsert(serverId, userId, accessToken)
+            userDao.upsert(serverId, userId, encryptedToken)
         }
         configureApiClientUser(userId, accessToken)
     }
@@ -50,7 +52,8 @@ class ApiClientController(
 
     suspend fun loadSavedUser(): UserEntity? = withContext(Dispatchers.IO) {
         val userId = appPreferences.currentUserId ?: return@withContext null
-        userDao.getUser(userId)
+        val user = userDao.getUser(userId) ?: return@withContext null
+        user.copy(accessToken = TokenEncryptionHelper.decrypt(user.accessToken))
     }
 
     suspend fun loadSavedServerUser(): ServerUser? {
@@ -62,13 +65,14 @@ class ApiClientController(
 
         configureApiClientServer(serverUser?.server)
 
-        if (serverUser?.user?.accessToken != null) {
-            configureApiClientUser(serverUser.user.userId, serverUser.user.accessToken)
+        val decryptedToken = TokenEncryptionHelper.decrypt(serverUser?.user?.accessToken)
+        if (decryptedToken != null && serverUser?.user != null) {
+            configureApiClientUser(serverUser.user.userId, decryptedToken)
         } else {
             resetApiClientUser()
         }
 
-        return serverUser
+        return serverUser?.let { it.copy(user = it.user.copy(accessToken = decryptedToken)) }
     }
 
     suspend fun loadPreviouslyUsedServers(): List<ServerEntity> = withContext(Dispatchers.IO) {
@@ -98,10 +102,11 @@ class ApiClientController(
 
     fun getApiClient(server: Long, user: Long): ApiClient {
         val serverUser = userDao.getServerUser(server, user) ?: error("Invalid server user combination (server=$server, user=$user)")
+        val decryptedToken = TokenEncryptionHelper.decrypt(serverUser.user.accessToken)
 
         return jellyfin.createApi(
             baseUrl = serverUser.server.hostname,
-            accessToken = serverUser.user.accessToken,
+            accessToken = decryptedToken,
             deviceInfo = baseDeviceInfo.copy(id = baseDeviceInfo.id + serverUser.user.userId),
         )
     }

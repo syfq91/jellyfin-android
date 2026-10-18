@@ -12,7 +12,7 @@
     <exclude
         domain="root"
         path="app_webview/VideoDecodeStats" />
-    <include
+    <exclude
         domain="database"
         path="." />
     <include

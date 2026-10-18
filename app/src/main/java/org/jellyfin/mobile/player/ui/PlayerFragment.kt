@@ -99,40 +99,6 @@ class PlayerFragment : Fragment(), BackPressInterceptor {
         val window = requireActivity().window
         playerFullscreenHelper = PlayerFullscreenHelper(window)
 
-        // Observe ViewModel
-        viewModel.player.observe(this) { player ->
-            playerView.player = player
-            // Automatically close fragment, unless we're in PiP mode
-            if (player == null && !(AndroidVersion.isAtLeastN && requireActivity().isInPictureInPictureMode)) {
-                parentFragmentManager.popBackStack()
-            }
-        }
-        viewModel.playerState.observe(this) { playerState ->
-            val isPlaying = viewModel.playerOrNull?.isPlaying == true
-            requireActivity().window.keepScreenOn = isPlaying
-            loadingIndicator.isVisible = playerState == Player.STATE_BUFFERING
-        }
-        viewModel.decoderType.observe(this) { type ->
-            playerMenus?.updatedSelectedDecoder(type)
-        }
-        viewModel.error.observe(this) { message ->
-            val safeMessage = message.ifEmpty { requireContext().getString(R.string.player_error_unspecific_exception) }
-            requireContext().toast(safeMessage)
-        }
-        viewModel.queueManager.currentMediaSource.observe(this) { mediaSource ->
-            if (mediaSource.selectedVideoStream?.isLandscape == false) {
-                // For portrait videos, immediately enable fullscreen
-                playerFullscreenHelper.enableFullscreen()
-            } else if (appPreferences.exoPlayerStartLandscapeVideoInLandscape) {
-                // Auto-switch to landscape for landscape videos if enabled
-                requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-            }
-
-            // Update title and player menus
-            toolbar.title = mediaSource.getName(requireContext())
-            playerMenus?.onQueueItemChanged(mediaSource, viewModel.queueManager.hasNext())
-        }
-
         // Handle fragment arguments, extract playback options and start playback
         lifecycleScope.launch {
             val context = requireContext()
@@ -207,6 +173,42 @@ class PlayerFragment : Fragment(), BackPressInterceptor {
 
         // Create playback menus
         playerMenus = PlayerMenus(this, playerBinding, playerControlsBinding)
+
+        // Observe ViewModel
+        viewModel.player.observe(viewLifecycleOwner) { player ->
+            playerView.player = player
+            // Automatically close fragment, unless we're in PiP mode
+            if (player == null && !(AndroidVersion.isAtLeastN && requireActivity().isInPictureInPictureMode)) {
+                parentFragmentManager.popBackStack()
+            }
+        }
+        viewModel.playerState.observe(viewLifecycleOwner) { playerState ->
+            val isPlaying = viewModel.playerOrNull?.isPlaying == true
+            requireActivity().window.keepScreenOn = isPlaying
+            loadingIndicator.isVisible = playerState == Player.STATE_BUFFERING
+            updatePictureInPictureParams()
+        }
+        viewModel.decoderType.observe(viewLifecycleOwner) { type ->
+            playerMenus?.updatedSelectedDecoder(type)
+        }
+        viewModel.error.observe(viewLifecycleOwner) { message ->
+            val safeMessage = message.ifEmpty { requireContext().getString(R.string.player_error_unspecific_exception) }
+            requireContext().toast(safeMessage)
+        }
+        viewModel.queueManager.currentMediaSource.observe(viewLifecycleOwner) { mediaSource ->
+            if (mediaSource.selectedVideoStream?.isLandscape == false) {
+                // For portrait videos, immediately enable fullscreen
+                playerFullscreenHelper.enableFullscreen()
+            } else if (appPreferences.exoPlayerStartLandscapeVideoInLandscape) {
+                // Auto-switch to landscape for landscape videos if enabled
+                requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+            }
+
+            // Update title and player menus
+            toolbar.title = mediaSource.getName(requireContext())
+            playerMenus?.onQueueItemChanged(mediaSource, viewModel.queueManager.hasNext())
+            updatePictureInPictureParams()
+        }
 
         // Set controller timeout
         suppressControllerAutoHide(false)
@@ -376,8 +378,41 @@ class PlayerFragment : Fragment(), BackPressInterceptor {
     }
 
     fun onUserLeaveHint() {
-        if (AndroidVersion.isAtLeastN && viewModel.playerOrNull != null) {
+        // On Android 12+, autoEnterEnabled handles PiP seamlessly on swipe to home
+        if (!AndroidVersion.isAtLeastS && AndroidVersion.isAtLeastN && viewModel.playerOrNull != null) {
             requireActivity().enterPictureInPicture()
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun buildPictureInPictureParams(autoEnter: Boolean = false): PictureInPictureParams {
+        return PictureInPictureParams.Builder().apply {
+            val aspectRational = currentVideoStream?.aspectRational?.let { aspectRational ->
+                when {
+                    aspectRational < PIP_MIN_RATIONAL -> PIP_MIN_RATIONAL
+                    aspectRational > PIP_MAX_RATIONAL -> PIP_MAX_RATIONAL
+                    else -> aspectRational
+                }
+            }
+            setAspectRatio(aspectRational)
+            val contentFrame: View? = playerView.findViewById(Media3R.id.exo_content_frame)
+            if (contentFrame != null) {
+                val contentRect = with(contentFrame) {
+                    val (x, y) = intArrayOf(0, 0).also(::getLocationInWindow)
+                    Rect(x, y, x + width, y + height)
+                }
+                setSourceRectHint(contentRect)
+            }
+            if (AndroidVersion.isAtLeastS) {
+                setAutoEnterEnabled(autoEnter)
+            }
+        }.build()
+    }
+
+    private fun updatePictureInPictureParams() {
+        if (AndroidVersion.isAtLeastS && _playerBinding != null) {
+            val isPlaying = viewModel.playerOrNull?.isPlaying == true
+            activity?.setPictureInPictureParams(buildPictureInPictureParams(autoEnter = isPlaying))
         }
     }
 
@@ -385,23 +420,8 @@ class PlayerFragment : Fragment(), BackPressInterceptor {
     @RequiresApi(Build.VERSION_CODES.N)
     private fun Activity.enterPictureInPicture() {
         if (AndroidVersion.isAtLeastO) {
-            val params = PictureInPictureParams.Builder().apply {
-                val aspectRational = currentVideoStream?.aspectRational?.let { aspectRational ->
-                    when {
-                        aspectRational < PIP_MIN_RATIONAL -> PIP_MIN_RATIONAL
-                        aspectRational > PIP_MAX_RATIONAL -> PIP_MAX_RATIONAL
-                        else -> aspectRational
-                    }
-                }
-                setAspectRatio(aspectRational)
-                val contentFrame: View = playerView.findViewById(Media3R.id.exo_content_frame)
-                val contentRect = with(contentFrame) {
-                    val (x, y) = intArrayOf(0, 0).also(::getLocationInWindow)
-                    Rect(x, y, x + width, y + height)
-                }
-                setSourceRectHint(contentRect)
-            }.build()
-            enterPictureInPictureMode(params)
+            val isPlaying = viewModel.playerOrNull?.isPlaying == true
+            enterPictureInPictureMode(buildPictureInPictureParams(autoEnter = isPlaying))
         } else {
             @Suppress("DEPRECATION")
             enterPictureInPictureMode()
@@ -433,6 +453,11 @@ class PlayerFragment : Fragment(), BackPressInterceptor {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        if (AndroidVersion.isAtLeastS) {
+            activity?.setPictureInPictureParams(
+                PictureInPictureParams.Builder().setAutoEnterEnabled(false).build(),
+            )
+        }
         // Detach player from PlayerView
         playerView.player = null
 

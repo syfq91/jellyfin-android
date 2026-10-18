@@ -25,6 +25,7 @@ import android.os.PowerManager
 import android.view.KeyEvent
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
 import androidx.core.content.getSystemService
 import androidx.core.text.HtmlCompat
@@ -139,7 +140,12 @@ class RemotePlayerService : Service(), CoroutineScope {
             addAction(BluetoothA2dp.ACTION_CONNECTION_STATE_CHANGED)
             addAction(BluetoothHeadset.ACTION_AUDIO_STATE_CHANGED)
         }
-        registerReceiver(receiver, filter)
+        ContextCompat.registerReceiver(
+            this,
+            receiver,
+            filter,
+            ContextCompat.RECEIVER_NOT_EXPORTED,
+        )
 
         // Create notification channel
         createMediaNotificationChannel(notificationManager)

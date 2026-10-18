@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <cloud-backup>
+        <include
+            domain="root"
+            path="app_webview" />
+        <exclude
+            domain="root"
+            path="app_webview/blob_storage" />
+        <exclude
+            domain="root"
+            path="app_webview/GPUCache" />
+        <exclude
+            domain="root"
+            path="app_webview/VideoDecodeStats" />
+        <exclude
+            domain="database"
+            path="." />
+        <include
+            domain="sharedpref"
+            path="org.jellyfin.mobile_preferences" />
+        <include
+            domain="sharedpref"
+            path="org.jellyfin.mobile.debug_preferences" />
+    </cloud-backup>
+    <device-transfer>
+        <include
+            domain="root"
+            path="app_webview" />
+        <exclude
+            domain="root"
+            path="app_webview/blob_storage" />
+        <exclude
+            domain="root"
+            path="app_webview/GPUCache" />
+        <exclude
+            domain="root"
+            path="app_webview/VideoDecodeStats" />
+        <exclude
+            domain="database"
+            path="." />
+        <include
+            domain="sharedpref"
+            path="org.jellyfin.mobile_preferences" />
+        <include
+            domain="sharedpref"
+            path="org.jellyfin.mobile.debug_preferences" />
+    </device-transfer>
+</data-extraction-rules>

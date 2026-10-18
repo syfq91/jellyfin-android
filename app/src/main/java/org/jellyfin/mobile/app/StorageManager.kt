@@ -40,7 +40,7 @@ class StorageManager(
             getStorageLocation()?.let(::ensureNoMedia)
         }.onFailure { err ->
             Timber.e(err, "Failed to change storage location to $location")
-        }.isFailure
+        }.isSuccess
     }
 
     fun verify(download: DownloadFiles): Boolean {

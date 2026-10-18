@@ -1,10 +1,13 @@
 package org.jellyfin.mobile.webapp
 
+import android.content.Intent
+import android.net.Uri
 import android.net.http.SslError
 import android.webkit.SslErrorHandler
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
+import androidx.core.net.toUri
 import androidx.webkit.WebResourceErrorCompat
 import androidx.webkit.WebViewAssetLoader.AssetsPathHandler
 import androidx.webkit.WebViewClientCompat
@@ -39,6 +42,35 @@ abstract class JellyfinWebViewClient(
     abstract fun onConnectedToWebapp()
 
     abstract fun onErrorReceived()
+
+    override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+        return handleUrlLoading(view, request.url)
+    }
+
+    @Deprecated("Deprecated in Android")
+    override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
+        return handleUrlLoading(view, url.toUri())
+    }
+
+    private fun handleUrlLoading(view: WebView, targetUri: Uri): Boolean {
+        val serverHost = server.hostname.toUri().host
+        val targetHost = targetUri.host
+
+        // Allow navigation within the configured Jellyfin server domain or empty/blank schemes
+        if (targetHost == null || targetHost.equals(serverHost, ignoreCase = true)) {
+            return false
+        }
+
+        // Launch external URLs in system browser
+        return try {
+            val intent = Intent(Intent.ACTION_VIEW, targetUri)
+            view.context.startActivity(intent)
+            true
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to launch external URL: %s", targetUri)
+            true
+        }
+    }
 
     override fun shouldInterceptRequest(webView: WebView, request: WebResourceRequest): WebResourceResponse? {
         val url = request.url

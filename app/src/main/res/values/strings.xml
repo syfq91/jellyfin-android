@@ -18,6 +18,7 @@
     </plurals>
     <string name="connection_error_unable_to_reach_sever">Unable to reach server</string>
     <string name="connection_error_unsupported_version_or_product">Unsupported version or product</string>
+    <string name="connection_warning_http">Warning: Connecting over unencrypted HTTP. Data and credentials may not be secure outside a trusted local network.</string>
     <string name="connect_button_text">Connect</string>
     <string name="choose_server_button_text">Choose server</string>
     <string name="available_servers_title">Available servers</string>

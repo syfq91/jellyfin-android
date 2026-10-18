@@ -181,6 +181,7 @@ private fun AddressSelection(
     onDiscoveryClick: () -> Unit,
     onSubmit: () -> Unit,
 ) {
+    val showHttpWarning = text.trim().startsWith("http://", ignoreCase = true)
     Column {
         ServerUrlField(
             text = text,
@@ -189,6 +190,7 @@ private fun AddressSelection(
             onSubmit = onSubmit,
         )
         AnimatedErrorText(errorText = errorText)
+        AnimatedHttpWarningText(showWarning = showHttpWarning && errorText == null)
         if (!loading) {
             Spacer(modifier = Modifier.height(12.dp))
             StyledTextButton(
@@ -263,6 +265,26 @@ private fun AnimatedErrorText(
                 .fillMaxWidth()
                 .padding(top = 4.dp),
             color = MaterialTheme.colors.error,
+            style = MaterialTheme.typography.caption,
+        )
+    }
+}
+
+@Stable
+@Composable
+private fun AnimatedHttpWarningText(
+    showWarning: Boolean,
+) {
+    AnimatedVisibility(
+        visible = showWarning,
+        exit = ExitTransition.None,
+    ) {
+        Text(
+            text = stringResource(R.string.connection_warning_http),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 4.dp),
+            color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
             style = MaterialTheme.typography.caption,
         )
     }

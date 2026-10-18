@@ -25,6 +25,7 @@
         android:name=".JellyfinApplication"
         android:allowBackup="true"
         android:fullBackupContent="@xml/backup_content"
+        android:dataExtractionRules="@xml/data_extraction_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:networkSecurityConfig="@xml/network_security_config"
@@ -88,7 +89,9 @@
             android:grantUriPermissions="true"
             android:readPermission="android.permission.MEDIA_CONTENT_CONTROL" />
 
-        <receiver android:name="org.jellyfin.mobile.downloads.DownloadBroadcastReceiver" />
+        <receiver
+            android:name="org.jellyfin.mobile.downloads.DownloadBroadcastReceiver"
+            android:exported="false" />
 
         <meta-data
             android:name="com.google.android.gms.version"

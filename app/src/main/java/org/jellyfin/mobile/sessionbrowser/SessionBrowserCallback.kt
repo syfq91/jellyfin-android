@@ -40,6 +40,7 @@ import org.jellyfin.mobile.sessionbrowser.page.RootLibraryPage
 import org.jellyfin.mobile.sessionbrowser.page.SearchLibraryPage
 import org.jellyfin.mobile.sessionbrowser.page.SuggestedLibraryPage
 import org.jellyfin.mobile.sessionbrowser.page.UserViewLibraryPage
+import org.jellyfin.mobile.app.ApiClientController
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.api.client.extensions.universalAudioApi
 import org.jellyfin.sdk.api.client.extensions.userLibraryApi
@@ -51,6 +52,7 @@ import timber.log.Timber
 class SessionBrowserCallback(
     private val context: Context,
     private val api: ApiClient,
+    private val apiClientController: ApiClientController,
 ) : MediaLibrarySession.Callback {
     companion object {
         const val MAX_PAGE_SIZE = 250
@@ -164,6 +166,12 @@ class SessionBrowserCallback(
         )
     }.build()
 
+    private suspend fun ensureAuthenticated() {
+        if (api.baseUrl == null || api.accessToken == null) {
+            apiClientController.loadSavedServerUser()
+        }
+    }
+
     private suspend fun createPageContentResult(
         route: LibraryRoute,
         params: LibraryParams? = null,
@@ -176,6 +184,8 @@ class SessionBrowserCallback(
                 context.getString(R.string.media_service_unknown_page)
             )
         )
+
+        ensureAuthenticated()
 
         if (api.baseUrl == null || api.accessToken == null) {
             return LibraryResult.ofError(
@@ -284,6 +294,7 @@ class SessionBrowserCallback(
         val libraryMediaId = runCatching { Json.decodeFromString<LibraryMediaId>(mediaId) }.getOrNull()
         when (libraryMediaId) {
             is LibraryMediaId.Item -> {
+                ensureAuthenticated()
                 val item by api.userLibraryApi.getItem(itemId = libraryMediaId.itemId)
                 LibraryResult.ofItem(LibraryPageElement.baseItem(api, item).toMediaItem(libraryMediaId.route), null)
             }
@@ -315,6 +326,8 @@ class SessionBrowserCallback(
         mediaItems: List<MediaItem>,
     ): ListenableFuture<List<MediaItem>> = CoroutineScope(Dispatchers.IO).future {
         Timber.d("onAddMediaItems $mediaSession $controller $mediaItems")
+
+        ensureAuthenticated()
 
         mediaItems.mapNotNull {
             val libraryMediaId = runCatching { Json.decodeFromString<LibraryMediaId>(it.mediaId) }.getOrNull()

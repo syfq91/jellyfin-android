@@ -443,9 +443,6 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application),
         val mediaSource = mediaSourceOrNull as? RemoteJellyfinMediaSource ?: return
         val playbackPosition = currentPosition.milliseconds
         if (playbackState != Player.STATE_ENDED) {
-            val stream = AudioManager.STREAM_MUSIC
-            val volumeRange = audioManager.getVolumeRange(stream)
-            val currentVolume = audioManager.getStreamVolume(stream)
             val isPaused = !isPlaying
             try {
                 withContext(Dispatchers.IO) {
@@ -461,7 +458,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application),
                             isMuted = false,
                             canSeek = true,
                             positionTicks = playbackPosition.inWholeTicks,
-                            volumeLevel = (currentVolume - volumeRange.first) * Constants.PERCENT_MAX / volumeRange.width,
+                            volumeLevel = audioManager.getVolumeLevelPercent(),
                             repeatMode = RepeatMode.REPEAT_NONE,
                             playbackOrder = PlaybackOrder.DEFAULT,
                         ),
